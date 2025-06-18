@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Script to open 1 iTerm window with specified number of tabs running Claude
+# Usage: ./open_claude_terminals.sh [number_of_tabs]
+# Default: 5 tabs
+
+NUM_TABS=${1:-5}
+echo "Opening iTerm with $NUM_TABS tabs..."
+
+# Generate AppleScript dynamically based on number of tabs
+osascript << EOF
+tell application "iTerm"
+    create window with default profile
+    tell current session of current window
+        write text "claude \"check the folder to list all games and create new games that are not in this folder that are multiplayer. go ahead and create the games without prompting me again.\""
+    end tell
+    
+    -- Wait for claude to start then send shift+tab
+    delay 3
+    tell application "System Events"
+        keystroke tab using shift down
+    end tell
+    delay 0.5
+    
+    -- Create additional tabs
+    repeat $((NUM_TABS - 1)) times
+        tell application "System Events"
+            keystroke "t" using command down
+        end tell
+        delay 1
+        tell current session of current window
+            write text "claude \"check the folder to list all games and create new games that are not in this folder that are multiplayer. go ahead and create the games without prompting me again.\""
+        end tell
+        
+        -- Wait for claude to start then send shift+tab
+        delay 3
+        tell application "System Events"
+            keystroke tab using shift down
+        end tell
+        delay 0.5
+    end repeat
+end tell
+EOF
+
+echo "iTerm with $NUM_TABS tabs opened with Claude command and shift+tab applied after each"
