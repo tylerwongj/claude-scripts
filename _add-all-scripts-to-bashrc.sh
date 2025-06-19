@@ -38,7 +38,9 @@ EOF
 # Function to add alias to claude module
 add_alias() {
     local script_path="$1"
-    local alias_name=$(basename "$script_path")
+    local filename=$(basename "$script_path")
+    # Remove .sh extension if present
+    local alias_name="${filename%.sh}"
     
     echo "➡️  Adding: $alias_name"
     
@@ -63,7 +65,8 @@ echo "🎉 All scripts processed!"
 echo ""
 echo "💡 Available script commands:"
 for script in "${scripts[@]}"; do
-    alias_name=$(basename "$script")
+    filename=$(basename "$script")
+    alias_name="${filename%.sh}"
     printf "   %-25s - %s\n" "$alias_name" "$script"
 done
 
