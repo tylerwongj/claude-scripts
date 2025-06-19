@@ -1,66 +1,54 @@
 #!/bin/bash
 
-# Add All Scripts to Bashrc - Automatically finds and adds all claude-* scripts as aliases
+# Add All Scripts to Aliases - Automatically finds and adds all scripts as aliases
 # Usage: ./_add-all-scripts-to-bashrc.sh
 
 SCRIPT_DIR="/Users/tyler/p2/claude-scripts"
+CLAUDE_MODULE="$HOME/dotfiles/bash/modules/claude.sh"
 
-echo "🤖 Adding all claude-* scripts to .bashrc as aliases..."
+echo "🤖 Creating claude.sh module with all scripts..."
 echo "📍 Script directory: $SCRIPT_DIR"
+echo "📍 Claude module: $CLAUDE_MODULE"
 echo ""
 
-# Find all files starting with "claude-" 
-scripts=($(find "$SCRIPT_DIR" -name "claude-*" -type f | sort))
+# Find all executable files starting with "claude-" or ending with ".sh"
+scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f \( -name "claude-*" -o -name "*.sh" \) ! -name "_*" | grep -v "\.tmp$" | sort))
 
 if [ ${#scripts[@]} -eq 0 ]; then
-    echo "❌ No claude-* scripts found in $SCRIPT_DIR"
+    echo "❌ No scripts found in $SCRIPT_DIR"
     exit 1
 fi
 
-echo "🔍 Found ${#scripts[@]} claude-* scripts:"
+echo "🔍 Found ${#scripts[@]} scripts:"
 for script in "${scripts[@]}"; do
     basename "$script"
 done
 echo ""
 
-# Remove existing AI block completely and regenerate fresh
-echo "🧹 Removing old AI aliases block..."
-if grep -q "# AI - /claude-scripts auto-generated aliases" ~/.bashrc; then
-    # Find start and end of AI block
-    start_line=$(grep -n "# AI - /claude-scripts auto-generated aliases" ~/.bashrc | cut -d: -f1)
-    
-    # Find the end (next comment line or end of file)
-    end_line=$(tail -n +$((start_line + 1)) ~/.bashrc | grep -n "^#" | head -1 | cut -d: -f1)
-    if [ -n "$end_line" ]; then
-        end_line=$((start_line + end_line))
-    else
-        end_line=$(wc -l < ~/.bashrc)
-        end_line=$((end_line + 1))
-    fi
-    
-    # Remove the entire AI block
-    sed -i.bak "${start_line},$((end_line - 1))d" ~/.bashrc
-    echo "✅ Removed old AI aliases block"
-fi
-echo ""
+# Create the claude.sh module
+echo "📝 Creating claude.sh module..."
+cat > "$CLAUDE_MODULE" << 'EOF'
+#!/bin/bash
 
-# Function to add alias to temp file
+# Claude AI Scripts Module
+# Auto-generated aliases for Claude-related scripts and tools
+
+EOF
+
+# Function to add alias to claude module
 add_alias() {
     local script_path="$1"
     local alias_name=$(basename "$script_path")
     
     echo "➡️  Adding: $alias_name"
     
-    # Add to temp file
-    echo "alias $alias_name='$script_path'" >> ~/.bashrc.tmp
+    # Add to claude module
+    echo "alias $alias_name='$script_path'" >> "$CLAUDE_MODULE"
     
     # Load alias in current session
     alias "$alias_name"="$script_path"
     echo "✅ Alias loaded in current session"
 }
-
-# Create temporary file for collecting aliases
-rm -f ~/.bashrc.tmp
 
 # Add each script as an alias
 echo "➕ Adding all scripts as aliases..."
@@ -69,22 +57,15 @@ for script in "${scripts[@]}"; do
 done
 echo ""
 
-# Add the fresh AI block to .bashrc
-if [ -f ~/.bashrc.tmp ]; then
-    echo "📍 Creating fresh AI aliases block..."
-    echo "# AI - /claude-scripts auto-generated aliases" >> ~/.bashrc
-    cat ~/.bashrc.tmp >> ~/.bashrc
-    rm -f ~/.bashrc.tmp
-    echo "✅ Fresh AI block added with all current scripts"
-fi
+echo "✅ claude.sh module created successfully"
 
-echo "🎉 All claude-* scripts processed!"
+echo "🎉 All scripts processed!"
 echo ""
-echo "💡 Available Claude commands:"
+echo "💡 Available script commands:"
 for script in "${scripts[@]}"; do
     alias_name=$(basename "$script")
     printf "   %-25s - %s\n" "$alias_name" "$script"
 done
 
 echo ""
-echo "🚀 Run 'source ~/.bashrc' to load all aliases in new terminals"
+echo "🚀 Run 'source ~/.bashrc' or open a new terminal to load all aliases"

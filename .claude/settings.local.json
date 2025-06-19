@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(brew install:*)",
-      "Bash(source ~/.bashrc)"
-    ],
-    "deny": []
-  }
-}
