@@ -20,7 +20,7 @@ tell application "iTerm"
     end tell
 
     -- Wait for claude to start then send shift+tab
-    delay 3
+    delay 2
     tell application "System Events"
         keystroke tab using shift down
     end tell
@@ -39,7 +39,7 @@ tell application "iTerm"
         end tell
 
         -- Wait for claude to start then send shift+tab
-        delay 3
+        delay 2
         tell application "System Events"
             keystroke tab using shift down
         end tell
