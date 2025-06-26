@@ -133,8 +133,6 @@ pull_repo() {
         return 1
     fi
     
-    print_status "$repo_name: Pulling from $remote_branch"
-    
     # Check for uncommitted changes before pulling
     if has_changes "$repo_path"; then
         print_warning "$repo_name: Has uncommitted changes, skipping pull"
@@ -190,7 +188,7 @@ push_repo() {
     # Check if remote exists
     if [[ -z "$remote_branch" ]]; then
         # Try to push to origin with current branch name
-        print_status "$repo_name: No remote tracking branch, attempting to push to origin/$current_branch"
+        # Try to push to origin with current branch name (silent attempt)
         if git push -u origin "$current_branch"; then
             print_success "$repo_name: Successfully pushed and set upstream"
             return 0
@@ -207,8 +205,6 @@ push_repo() {
         return 0
     fi
     
-    print_status "$repo_name: Pushing $ahead commit(s) to $remote_branch"
-    
     if git push; then
         print_success "$repo_name: Successfully pushed"
         return 0
@@ -222,8 +218,6 @@ push_repo() {
 sync_repo() {
     local repo_path="$1"
     local repo_name=$(basename "$repo_path")
-    
-    print_status "$repo_name: Starting sync"
     
     # First pull
     if pull_repo "$repo_path"; then
