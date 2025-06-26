@@ -4,7 +4,7 @@
 # Lists all git repositories with clickable file:// links
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_PATHS_FILE="$SCRIPT_DIR/sync-repos/repo-paths.txt"
+REPO_PATHS_FILE="$SCRIPT_DIR/repo-paths.txt"
 
 # Colors for output
 GREEN='\033[0;32m'
