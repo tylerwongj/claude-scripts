@@ -119,7 +119,7 @@ pull_repo() {
     
     # Check if it's a git repository
     if ! git rev-parse --git-dir > /dev/null 2>&1; then
-        print_warning "$repo_name: Not a git repository"
+        print_warning "PULL: Not a git repository"
         return 1
     fi
     
@@ -129,13 +129,13 @@ pull_repo() {
     local remote_branch=$(echo "$branch_info" | cut -d'|' -f2)
     
     if [[ -z "$remote_branch" ]]; then
-        print_warning "$repo_name: No remote tracking branch set"
+        print_warning "PULL: No remote tracking branch set"
         return 1
     fi
     
     # Check for uncommitted changes before pulling
     if has_changes "$repo_path"; then
-        print_warning "$repo_name: Has uncommitted changes, skipping pull"
+        print_warning "PULL: Has uncommitted changes, skipping"
         return 1
     fi
     
@@ -144,13 +144,13 @@ pull_repo() {
     
     if [[ $pull_exit_code -eq 0 ]]; then
         if [[ "$pull_output" == *"Already up to date"* ]] || [[ "$pull_output" == *"up to date"* ]]; then
-            print_status "$repo_name: Already up to date"
+            print_status "PULL: Already up to date"
         else
-            print_success "$repo_name: Successfully pulled changes"
+            print_success "PULL: Successfully pulled changes"
         fi
         return 0
     else
-        print_error "$repo_name: Failed to pull - $pull_output"
+        print_error "PULL: Failed - $pull_output"
         return 1
     fi
 }
@@ -164,13 +164,13 @@ push_repo() {
     
     # Check if it's a git repository
     if ! git rev-parse --git-dir > /dev/null 2>&1; then
-        print_warning "$repo_name: Not a git repository"
+        print_warning "PUSH: Not a git repository"
         return 1
     fi
     
     # Check if there are any commits
     if ! git rev-parse HEAD > /dev/null 2>&1; then
-        print_warning "$repo_name: No commits found"
+        print_warning "PUSH: No commits found"
         return 1
     fi
     
@@ -181,7 +181,7 @@ push_repo() {
     
     # Check for uncommitted changes
     if has_changes "$repo_path"; then
-        print_warning "$repo_name: Has uncommitted changes, skipping push"
+        print_warning "PUSH: Has uncommitted changes, skipping"
         return 1
     fi
     
@@ -190,10 +190,10 @@ push_repo() {
         # Try to push to origin with current branch name
         # Try to push to origin with current branch name (silent attempt)
         if git push -u origin "$current_branch"; then
-            print_success "$repo_name: Successfully pushed and set upstream"
+            print_success "PUSH: Successfully pushed and set upstream"
             return 0
         else
-            print_error "$repo_name: Failed to push to origin"
+            print_error "PUSH: Failed to push to origin"
             return 1
         fi
     fi
@@ -201,15 +201,15 @@ push_repo() {
     # Check if we're ahead of remote
     local ahead=$(git rev-list --count "@{u}..HEAD" 2>/dev/null || echo "0")
     if [[ "$ahead" == "0" ]]; then
-        print_status "$repo_name: Already up to date with remote"
+        print_status "PUSH: Already up to date with remote"
         return 0
     fi
     
     if git push; then
-        print_success "$repo_name: Successfully pushed"
+        print_success "PUSH: Successfully pushed"
         return 0
     else
-        print_error "$repo_name: Failed to push"
+        print_error "PUSH: Failed to push"
         return 1
     fi
 }
@@ -224,7 +224,7 @@ sync_repo() {
         # Then push
         push_repo "$repo_path"
     else
-        print_error "$repo_name: Sync failed due to pull error"
+        print_error "SYNC: Failed due to pull error"
         return 1
     fi
 }
