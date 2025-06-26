@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Add All Scripts to Aliases - Automatically finds and adds all scripts as aliases
-# Usage: ./_add-all-scripts-to-bashrc.sh
+# Sync All Scripts to Claude Module - Automatically finds and syncs all scripts as aliases
+# Usage: ./_sync-all-scripts-to-claude.sh
 
 SCRIPT_DIR="/Users/tyler/p2/claude-scripts"
 CLAUDE_MODULE="$HOME/dotfiles/bash/modules/claude.sh"
 
-echo "🤖 Creating claude.sh module with all scripts..."
+echo "🤖 Syncing claude.sh module with all scripts..."
 echo "📍 Script directory: $SCRIPT_DIR"
 echo "📍 Claude module: $CLAUDE_MODULE"
 echo ""
@@ -25,8 +25,8 @@ for script in "${scripts[@]}"; do
 done
 echo ""
 
-# Create the claude.sh module
-echo "📝 Creating claude.sh module..."
+# Sync the claude.sh module
+echo "📝 Syncing claude.sh module..."
 cat > "$CLAUDE_MODULE" << 'EOF'
 #!/bin/bash
 
@@ -52,14 +52,14 @@ add_alias() {
     echo "✅ Alias loaded in current session"
 }
 
-# Add each script as an alias
-echo "➕ Adding all scripts as aliases..."
+# Sync each script as an alias
+echo "➕ Syncing all scripts as aliases..."
 for script in "${scripts[@]}"; do
     add_alias "$script"
 done
 echo ""
 
-echo "✅ claude.sh module created successfully"
+echo "✅ claude.sh module synced successfully"
 
 echo "🎉 All scripts processed!"
 echo ""

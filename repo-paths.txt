@@ -1,0 +1,10 @@
+# Git Repository Paths Configuration
+# One path per line - script will find all git repos in these directories
+# Lines starting with # are ignored
+
+~/p2
+~/dotfiles
+~/p6
+
+# Exclusions (directories to ignore - add more as needed):
+# ~/p2/zOLD
