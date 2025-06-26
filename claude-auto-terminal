@@ -2,8 +2,7 @@
 
 WORK_DIR="~/p6"
 
-PROMPT="claude \"continue to create more games in /games-not-yet-tested folder. they games should The game should not be repeats, so make sure to list the folder and final repeat games.  You can do games that are like card
-  games, board games, any types of games.create five of them and make sure to use the games in the /games folder as reference of how to integrate the packages from the packages folder.\""
+PROMPT="claude 'create more games in /games-not-yet-tested folder. The games should not be repeats, so make sure to list the folder and avoid duplicate games. You can do games that are like card games, board games, any types of games. Create five of them and make sure to use the games in the /games folder as reference of how to integrate the packages from the packages folder.'"
 
 # Script to open 1 iTerm window with specified number of tabs running Claude
 # Usage: ./claude-auto-terminal [number_of_tabs]
