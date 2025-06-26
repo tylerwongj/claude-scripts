@@ -135,11 +135,24 @@ pull_repo() {
     
     print_status "$repo_name: Pulling from $remote_branch"
     
-    if git pull --rebase; then
-        print_success "$repo_name: Successfully pulled"
+    # Check for uncommitted changes before pulling
+    if has_changes "$repo_path"; then
+        print_warning "$repo_name: Has uncommitted changes, skipping pull"
+        return 1
+    fi
+    
+    local pull_output=$(git pull --rebase 2>&1)
+    local pull_exit_code=$?
+    
+    if [[ $pull_exit_code -eq 0 ]]; then
+        if [[ "$pull_output" == *"Already up to date"* ]] || [[ "$pull_output" == *"up to date"* ]]; then
+            print_status "$repo_name: Already up to date"
+        else
+            print_success "$repo_name: Successfully pulled changes"
+        fi
         return 0
     else
-        print_error "$repo_name: Failed to pull"
+        print_error "$repo_name: Failed to pull - $pull_output"
         return 1
     fi
 }
