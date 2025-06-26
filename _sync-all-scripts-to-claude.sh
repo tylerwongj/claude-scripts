@@ -25,15 +25,32 @@ for script in "${scripts[@]}"; do
 done
 echo ""
 
-# Sync the claude.sh module
-echo "📝 Syncing claude.sh module..."
-cat > "$CLAUDE_MODULE" << 'EOF'
-#!/bin/bash
+# Backup existing claude.sh and preserve non-auto-generated content
+echo "📝 Updating claude.sh module (preserving existing aliases)..."
 
-# Claude AI Scripts Module
-# Auto-generated aliases for Claude-related scripts and tools
+# Create temporary file to store content before auto-generated section
+temp_file=$(mktemp)
 
-EOF
+# Extract everything before the auto-generated section and after it
+if [ -f "$CLAUDE_MODULE" ]; then
+    # Get content before START marker
+    sed '/^# \[CC\] START - Claude Code AUTO-GENERATED Aliases/,$d' "$CLAUDE_MODULE" > "$temp_file"
+    
+    # Get content after END marker
+    temp_after=$(mktemp)
+    sed -n '/^# \[CC\] END - Claude Code AUTO-GENERATED Aliases/,$p' "$CLAUDE_MODULE" | tail -n +2 > "$temp_after"
+else
+    echo "#!/bin/bash" > "$temp_file"
+    echo "" >> "$temp_file"
+    temp_after=$(mktemp)
+fi
+
+# Start writing the new claude.sh file
+cp "$temp_file" "$CLAUDE_MODULE"
+echo "# [CC] START - Claude Code AUTO-GENERATED Aliases" >> "$CLAUDE_MODULE"
+
+# Clean up temp file
+rm "$temp_file"
 
 # Function to add alias to claude module
 add_alias() {
@@ -57,6 +74,15 @@ echo "➕ Syncing all scripts as aliases..."
 for script in "${scripts[@]}"; do
     add_alias "$script"
 done
+
+# Add END marker and restore content after it
+echo "# [CC] END - Claude Code AUTO-GENERATED Aliases" >> "$CLAUDE_MODULE"
+if [ -f "$temp_after" ] && [ -s "$temp_after" ]; then
+    cat "$temp_after" >> "$CLAUDE_MODULE"
+fi
+
+# Clean up temp files
+rm -f "$temp_after"
 echo ""
 
 echo "✅ claude.sh module synced successfully"
