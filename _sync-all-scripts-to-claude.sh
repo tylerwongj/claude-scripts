@@ -11,8 +11,8 @@ echo "📍 Script directory: $SCRIPT_DIR"
 echo "📍 Claude module: $CLAUDE_MODULE"
 echo ""
 
-# Find all executable files starting with "claude-" or ending with ".sh"
-scripts=($(find "$SCRIPT_DIR" -maxdepth 1 -type f \( -name "claude-*" -o -name "*.sh" \) ! -name "_*" | grep -v "\.tmp$" | sort))
+# Find all executable files starting with "claude-" or ending with ".sh" (max 2 levels deep, excluding zOLD)
+scripts=($(find "$SCRIPT_DIR" -maxdepth 2 -type f \( -name "claude-*" -o -name "*.sh" \) ! -name "_*" ! -path "*/zOLD/*" | grep -v "\.tmp$" | sort))
 
 if [ ${#scripts[@]} -eq 0 ]; then
     echo "❌ No scripts found in $SCRIPT_DIR"

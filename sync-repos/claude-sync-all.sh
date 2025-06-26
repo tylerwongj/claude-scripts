@@ -243,6 +243,8 @@ main() {
     # Process each repository
     for repo in "${repos[@]}"; do
         echo
+        repo_name=$(basename "$repo")
+        echo -e "${BLUE}📁 $repo_name${NC}: file://$repo"
         case "$ACTION" in
             "pull")
                 if pull_repo "$repo"; then
