@@ -1,0 +1,127 @@
+#!/bin/bash
+
+# Script to start 5 random games from ~/p4 directory
+# Opens Chrome with 5 localhost tabs (ports 3000-3004)
+
+MAX_GAMES=5
+PORT_START=3000
+CURRENT_PORT=$PORT_START
+STARTED_COUNT=0
+
+# Change to games directory
+GAMES_DIR="$HOME/p4"
+if [ ! -d "$GAMES_DIR" ]; then
+    echo "❌ Games directory not found: $GAMES_DIR"
+    exit 1
+fi
+cd "$GAMES_DIR"
+
+echo "🎮 Starting 5 random games from ~/p4..."
+echo "📋 Games will be available at:"
+
+# Array to store the games we're starting
+declare -a STARTED_GAMES=()
+
+# Function to start a game
+start_game() {
+    local game_dir=$1
+    local port=$2
+    local game_name=$(basename "$game_dir")
+
+    if [ -f "$game_dir/package.json" ] && [ -f "$game_dir/server.js" ]; then
+        echo "🚀 Starting $game_name on port $port"
+        echo "   http://localhost:$port"
+
+        # Start the game in a new iTerm tab - install deps first if needed
+        osascript << EOF
+tell application "iTerm"
+    if not (exists window 1) then
+        create window with default profile
+    end if
+    tell current window
+        create tab with default profile
+    end tell
+    tell current session of current window
+        write text "cd '$game_dir' && npm install && PORT=$port npm start"
+    end tell
+end tell
+EOF
+
+        STARTED_GAMES+=("$game_name:$port")
+        return 0
+    else
+        echo "⚠️  Skipping $game_name (no package.json or server.js found)"
+        return 1
+    fi
+}
+
+# Get all valid game directories (excluding @tyler and zOLD)
+valid_games=()
+for game_dir in */; do
+    if [[ "$game_dir" == "@tyler/" ]] || [[ "$game_dir" == "zOLD/" ]]; then
+        continue
+    fi
+    if [ -f "$game_dir/package.json" ] && [ -f "$game_dir/server.js" ]; then
+        valid_games+=("$game_dir")
+    fi
+done
+
+# Check if we have enough games
+if [ ${#valid_games[@]} -lt $MAX_GAMES ]; then
+    echo "⚠️  Only found ${#valid_games[@]} valid games, starting all of them..."
+    MAX_GAMES=${#valid_games[@]}
+fi
+
+# Choose a random starting position
+if [ ${#valid_games[@]} -gt 0 ]; then
+    # Sort the games alphabetically
+    IFS=$'\n' sorted_games=($(sort <<<"${valid_games[*]}")); unset IFS
+    
+    # Choose random starting index
+    start_index=$((RANDOM % (${#sorted_games[@]} - MAX_GAMES + 1)))
+    
+    echo "🎲 Random starting position: ${start_index} (game: $(basename "${sorted_games[$start_index]}"))"
+    
+    # Start games from the random position
+    for ((i=start_index; i<start_index+MAX_GAMES && i<${#sorted_games[@]}; i++)); do
+        if start_game "$PWD/${sorted_games[$i]}" $CURRENT_PORT; then
+            ((CURRENT_PORT++))
+            ((STARTED_COUNT++))
+        fi
+    done
+else
+    echo "❌ No valid games found in $GAMES_DIR"
+    exit 1
+fi
+
+echo ""
+echo "✅ Started $STARTED_COUNT games!"
+echo ""
+echo "🌐 Opening Chrome with game tabs..."
+
+# Wait for servers to start up
+echo "⏳ Waiting for servers to start..."
+sleep 3
+
+# Open Chrome with all 5 localhost tabs
+chrome_urls=""
+for ((port=PORT_START; port<PORT_START+MAX_GAMES; port++)); do
+    chrome_urls="$chrome_urls http://localhost:$port"
+done
+
+# Open Chrome with all URLs at once
+open -a "Google Chrome" $chrome_urls
+
+echo ""
+echo "🌐 Quick Access URLs:"
+for game_info in "${STARTED_GAMES[@]}"; do
+    IFS=':' read -r name port <<< "$game_info"
+    echo "   $name: http://localhost:$port"
+done
+
+echo ""
+echo "💡 Tips:"
+echo "   • Use Cmd+Shift+[ and Cmd+Shift+] to switch between iTerm tabs"
+echo "   • Use Ctrl+Tab in Chrome to cycle between localhost tabs"
+echo "   • Press Ctrl+C in any iTerm tab to stop that game"
+echo "   • Run './claude-stop-games' to stop all games at once"
