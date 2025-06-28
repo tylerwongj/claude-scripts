@@ -3,7 +3,7 @@
 # Lines starting with # are ignored
 
 ~/dotfiles
-~/p6
+~/tyler-arcade
 ~/p2
 
 # Exclusions (directories to ignore - add more as needed):

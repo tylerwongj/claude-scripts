@@ -62,7 +62,7 @@ Configuration file format:
 ```
 ~/p2
 ~/dotfiles
-~/p6
+~/tyler-arcade
 ```
 
 ## Script Discovery & Aliasing

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WORK_DIR="~/p6"
+WORK_DIR="~/tyler-arcade"
 
 PROMPT="claude 'create more games in /games-not-yet-tested folder. The games should not be repeats, so make sure to list the folder and avoid duplicate games. You can do games that are like card games, board games, any types of games. Create five of them and make sure to use the games in the /games folder as reference of how to integrate the packages from the packages folder.'"
 

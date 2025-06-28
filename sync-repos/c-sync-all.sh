@@ -14,6 +14,8 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+MAGENTA='\033[1;35m'
 NC='\033[0m' # No Color
 
 # Function to print colored output
@@ -251,7 +253,7 @@ main() {
     for repo in "${repos[@]}"; do
         echo
         repo_name=$(basename "$repo")
-        echo -e "${BLUE}📁 $repo_name${NC}: file://$repo"
+        echo -e "📁 ${MAGENTA}$repo_name${NC}: file://$repo"
         case "$ACTION" in
             "pull")
                 if pull_repo "$repo"; then
