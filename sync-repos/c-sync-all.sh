@@ -54,6 +54,11 @@ find_git_repos() {
             continue
         fi
         
+        # Check if repo has a remote
+        if ! (cd "$repo_path" && git remote | grep -q .); then
+            continue
+        fi
+        
         echo "$repo_path"
     done
 }
